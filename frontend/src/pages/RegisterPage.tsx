@@ -103,7 +103,7 @@ export function RegisterPage() {
       {formError ? (
         <div
           role="alert"
-          className="mb-5 border border-danger-strong bg-danger/10 px-3 py-2.5 text-sm leading-5 text-danger-ink"
+          className="mb-5 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm leading-5 text-red-700"
         >
           {formError}
         </div>
@@ -154,7 +154,7 @@ export function RegisterPage() {
         Already have an account?{" "}
         <Link
           to="/login"
-          className="font-medium text-ink underline decoration-line-strong underline-offset-4 transition-colors hover:decoration-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+          className="font-medium text-accent underline decoration-orange-200 underline-offset-4 transition-colors hover:text-accent-hover hover:decoration-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
         >
           Sign in
         </Link>

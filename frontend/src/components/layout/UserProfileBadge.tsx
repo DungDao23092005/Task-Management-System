@@ -43,13 +43,13 @@ export function UserProfileBadge() {
   return (
     <div className="flex min-w-0 items-center gap-2 sm:gap-3">
       <div className="hidden min-w-0 text-right sm:block">
-        <p className="truncate text-sm font-medium text-ink">{user.full_name}</p>
+        <p className="truncate text-sm font-semibold text-ink">{user.full_name}</p>
         <p className="truncate text-xs text-muted">{user.email}</p>
       </div>
 
       <span
         aria-hidden="true"
-        className="grid size-9 shrink-0 place-items-center border border-line-strong bg-raised font-mono text-[11px] font-semibold tracking-[0.08em] text-ink"
+        className="grid size-9 shrink-0 place-items-center rounded-xl border border-line bg-surface font-mono text-[11px] font-semibold tracking-[0.08em] text-ink shadow-xs"
       >
         {getInitials(user.full_name, user.email)}
       </span>

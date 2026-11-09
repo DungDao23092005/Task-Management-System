@@ -33,15 +33,15 @@ export function TaskPagination({
   return (
     <nav
       aria-label="Phân trang công việc"
-      className="flex flex-col gap-4 border border-line bg-surface p-4 sm:flex-row sm:items-center sm:justify-between"
+      className="flex flex-col gap-4 rounded-2xl border border-line bg-surface p-4 shadow-xs sm:flex-row sm:items-center sm:justify-between"
     >
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-        <p className="text-sm text-ink">
-          Trang <span className="tabular-nums">{page}</span> /{" "}
-          <span className="tabular-nums">{totalPages}</span>
+        <p className="text-sm font-medium text-ink">
+          Trang <span className="font-semibold tabular-nums">{page}</span> /{" "}
+          <span className="font-semibold tabular-nums">{totalPages}</span>
         </p>
         <p className="text-xs text-muted">
-          Tổng <span className="tabular-nums">{total}</span> công việc
+          Tổng <span className="font-medium tabular-nums">{total}</span> công việc
         </p>
       </div>
 
@@ -55,7 +55,7 @@ export function TaskPagination({
             value={pageSize}
             disabled={isLoading}
             onChange={(event) => onPageSizeChange(Number(event.target.value))}
-            className="h-10 rounded-[2px] border border-line-strong bg-canvas px-2 text-sm text-ink transition-colors duration-150 focus-visible:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+            className="h-9 rounded-xl border border-line bg-surface px-2.5 text-sm font-medium text-ink shadow-xs transition-colors duration-150 hover:border-line-strong focus-visible:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
           >
             {PAGE_SIZE_OPTIONS.map((option) => (
               <option key={option} value={option}>
@@ -71,7 +71,7 @@ export function TaskPagination({
             aria-label="Trang trước"
             disabled={page <= 1 || isLoading}
             onClick={() => onPageChange(page - 1)}
-            className="px-3"
+            className="h-9 px-3"
           >
             <ChevronLeft aria-hidden="true" className="size-4" />
             Trước
@@ -81,7 +81,7 @@ export function TaskPagination({
             aria-label="Trang sau"
             disabled={page >= totalPages || isLoading}
             onClick={() => onPageChange(page + 1)}
-            className="px-3"
+            className="h-9 px-3"
           >
             Sau
             <ChevronRight aria-hidden="true" className="size-4" />

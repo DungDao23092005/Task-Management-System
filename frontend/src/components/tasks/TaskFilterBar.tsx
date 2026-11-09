@@ -48,10 +48,10 @@ function FilterSelect({
   const id = useId();
 
   return (
-    <div className="grid gap-2">
+    <div className="grid gap-1.5">
       <label
         htmlFor={id}
-        className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-muted"
+        className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted"
       >
         {label}
       </label>
@@ -60,7 +60,7 @@ function FilterSelect({
           id={id}
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          className="h-10 w-full appearance-none rounded-[2px] border border-line-strong bg-canvas px-3 pr-9 text-sm text-ink transition-colors duration-150 focus-visible:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+          className="h-10 w-full appearance-none rounded-xl border border-line bg-surface px-3 pr-9 text-sm text-ink transition-colors duration-150 hover:border-line-strong focus-visible:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
         >
           {children}
         </select>
@@ -87,7 +87,7 @@ export function TaskFilterBar({
     <section
       role="search"
       aria-label="Bộ lọc công việc"
-      className="border border-line bg-surface p-4 sm:p-5"
+      className="rounded-2xl border border-line bg-surface p-4 shadow-xs sm:p-5"
     >
       <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_12rem_12rem_auto] md:items-end">
         <Input

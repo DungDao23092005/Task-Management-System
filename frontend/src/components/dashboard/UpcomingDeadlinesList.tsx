@@ -72,11 +72,11 @@ export function UpcomingDeadlinesList({
   return (
     <section
       aria-labelledby="upcoming-deadlines-heading"
-      className="border border-line bg-surface"
+      className="overflow-hidden rounded-2xl border border-line bg-surface shadow-xs"
     >
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4 sm:px-7">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line bg-surface-subtle/60 px-5 py-4 sm:px-7">
         <div className="flex min-w-0 items-center gap-3">
-          <span className="grid size-9 shrink-0 place-items-center border border-line-strong bg-raised">
+          <span className="grid size-9 shrink-0 place-items-center rounded-xl border border-orange-200 bg-orange-50 shadow-xs">
             <CalendarClock aria-hidden="true" className="size-4 text-accent" />
           </span>
           <div className="min-w-0">
@@ -94,7 +94,7 @@ export function UpcomingDeadlinesList({
 
         <Link
           to="/tasks"
-          className="inline-flex min-h-11 items-center gap-2 px-1 text-xs font-medium text-muted transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+          className="inline-flex min-h-11 items-center gap-1 px-1 text-xs font-semibold text-accent transition-colors hover:text-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
         >
           Mở danh sách
           <ArrowUpRight aria-hidden="true" className="size-3.5" />
@@ -120,16 +120,16 @@ export function UpcomingDeadlinesList({
                 <span
                   aria-hidden="true"
                   className={cn(
-                    "absolute inset-y-0 left-0 w-px",
-                    urgency.isNear ? "bg-accent" : "bg-line",
+                    "absolute inset-y-0 left-0 w-1",
+                    urgency.isNear ? "bg-accent" : "bg-transparent",
                   )}
                 />
 
-                <div className="grid gap-3 px-5 py-4 transition-colors hover:bg-raised/45 sm:px-7 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+                <div className="grid gap-3 px-5 py-4 transition-colors hover:bg-surface-subtle/60 sm:px-7 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
                   <div className="min-w-0">
                     <Link
                       to={`/tasks?highlight=${deadline.id}`}
-                      className="inline-flex min-h-11 max-w-full items-center text-sm font-medium text-ink transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+                      className="inline-flex min-h-11 max-w-full items-center text-sm font-semibold text-ink transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
                     >
                       <span className="break-words">{deadline.title}</span>
                     </Link>
@@ -145,14 +145,14 @@ export function UpcomingDeadlinesList({
                       <p
                         className={cn(
                           "font-mono text-[10px] uppercase tracking-[0.14em]",
-                          urgency.isNear ? "text-accent" : "text-muted",
+                          urgency.isNear ? "font-semibold text-accent" : "text-muted",
                         )}
                       >
                         {urgency.label}
                       </p>
                       <time
                         dateTime={dueDate ? deadline.due_date : undefined}
-                        className="mt-1 block text-xs leading-5 text-muted"
+                        className="mt-0.5 block text-xs leading-5 text-muted"
                       >
                         {formatDateTime(
                           deadline.due_date,
@@ -165,7 +165,7 @@ export function UpcomingDeadlinesList({
                     <Link
                       to={`/tasks?highlight=${deadline.id}`}
                       aria-label={`Mở "${deadline.title}" trong khu vực công việc`}
-                      className="grid size-11 shrink-0 place-items-center border border-line-strong bg-raised text-muted transition-colors hover:border-accent hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+                      className="grid size-10 shrink-0 place-items-center rounded-xl border border-line bg-surface text-muted shadow-xs transition-colors hover:border-orange-200 hover:bg-orange-50 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
                     >
                       <ArrowUpRight
                         aria-hidden="true"

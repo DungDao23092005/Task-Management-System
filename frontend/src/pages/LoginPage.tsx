@@ -84,7 +84,7 @@ export function LoginPage() {
       {sessionExpired ? (
         <div
           role="alert"
-          className="mb-5 border border-amber/40 bg-amber/10 px-3 py-2.5 text-sm leading-5 text-ink"
+          className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-sm leading-5 text-amber-900"
         >
           Your session expired. Sign in again to continue where you left off.
         </div>
@@ -93,7 +93,7 @@ export function LoginPage() {
       {registered ? (
         <div
           role="status"
-          className="mb-5 border border-brand-bright/40 bg-brand/10 px-3 py-2.5 text-sm leading-5 text-ink"
+          className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-sm leading-5 text-emerald-900"
         >
           Account created. Sign in with your new credentials.
         </div>
@@ -102,7 +102,7 @@ export function LoginPage() {
       {formError ? (
         <div
           role="alert"
-          className="mb-5 border border-danger-strong bg-danger/10 px-3 py-2.5 text-sm leading-5 text-danger-ink"
+          className="mb-5 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm leading-5 text-red-700"
         >
           {formError}
         </div>
@@ -143,7 +143,7 @@ export function LoginPage() {
         New to Fieldnote?{" "}
         <Link
           to="/register"
-          className="font-medium text-ink underline decoration-line-strong underline-offset-4 transition-colors hover:decoration-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+          className="font-medium text-accent underline decoration-orange-200 underline-offset-4 transition-colors hover:text-accent-hover hover:decoration-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
         >
           Create an account
         </Link>

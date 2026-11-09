@@ -28,7 +28,7 @@ export function TaskHighlightBanner({
       role={isError ? "alert" : "status"}
       aria-live={isError ? "assertive" : "polite"}
       aria-labelledby="highlight-banner-title"
-      className="relative overflow-hidden border border-line bg-surface p-4 sm:p-5"
+      className="relative overflow-hidden rounded-2xl border border-line bg-surface p-4 shadow-xs sm:p-5"
     >
       <span
         aria-hidden="true"
@@ -40,10 +40,10 @@ export function TaskHighlightBanner({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3">
           <span
-            className={`mt-0.5 grid size-7 shrink-0 place-items-center rounded-[2px] border ${
+            className={`mt-0.5 grid size-7 shrink-0 place-items-center rounded-xl border ${
               isError
-                ? "border-danger/45 bg-danger/10 text-danger-ink"
-                : "border-accent/45 bg-accent/10 text-accent"
+                ? "border-red-200 bg-red-50 text-red-600"
+                : "border-orange-200 bg-orange-50 text-accent shadow-xs"
             }`}
           >
             {state.type === "found" ? (
@@ -56,7 +56,7 @@ export function TaskHighlightBanner({
           <div className="min-w-0">
             <p
               id="highlight-banner-eyebrow"
-              className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted"
+              className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted"
             >
               {state.type === "found"
                 ? "Liên kết công việc"
@@ -116,7 +116,7 @@ export function TaskHighlightBanner({
             type="button"
             onClick={onDismiss}
             aria-label="Đóng thông báo liên kết"
-            className="inline-flex size-8 shrink-0 items-center justify-center rounded-[2px] text-muted transition-colors hover:bg-raised hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="inline-flex size-8 shrink-0 items-center justify-center rounded-xl text-muted transition-colors hover:bg-slate-100 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             <X aria-hidden="true" className="size-4" />
           </button>

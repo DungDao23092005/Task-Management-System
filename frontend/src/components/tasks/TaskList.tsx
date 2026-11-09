@@ -28,7 +28,7 @@ function SkeletonBlock({ className }: { className: string }) {
   return (
     <span
       aria-hidden="true"
-      className={`block rounded-[1px] bg-line ${PULSE} ${className}`}
+      className={`block rounded-lg bg-slate-200/80 ${PULSE} ${className}`}
     />
   );
 }
@@ -48,10 +48,10 @@ function TaskListSkeleton() {
         <div
           key={item}
           aria-hidden="true"
-          className="border border-line bg-surface p-4 sm:p-5"
+          className="rounded-2xl border border-line bg-surface p-4 shadow-xs sm:p-5"
         >
           <SkeletonBlock className="h-4 w-[min(28rem,70%)]" />
-          <SkeletonBlock className="mt-2 h-3 w-[min(22rem,55%)]" />
+          <SkeletonBlock className="mt-2.5 h-3 w-[min(22rem,55%)]" />
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
             <SkeletonBlock className="h-5 w-20" />
             <SkeletonBlock className="h-5 w-16" />
@@ -83,21 +83,21 @@ function TaskListMessage({
     <section
       role={alert ? "alert" : undefined}
       aria-labelledby="task-list-message-heading"
-      className="relative overflow-hidden border border-line bg-surface"
+      className="relative overflow-hidden rounded-2xl border border-line bg-surface shadow-xs"
     >
       <span
         aria-hidden="true"
-        className={`absolute inset-y-0 left-0 w-px ${
+        className={`absolute inset-y-0 left-0 w-1 ${
           tone === "danger" ? "bg-danger" : "bg-accent"
         }`}
       />
 
       <div className="max-w-2xl p-6 sm:p-8">
         <span
-          className={`grid size-11 place-items-center border ${
+          className={`grid size-11 place-items-center rounded-xl border ${
             tone === "danger"
-              ? "border-danger/45 bg-danger/10 text-danger-ink"
-              : "border-line-strong bg-raised text-accent"
+              ? "border-red-200 bg-red-50 text-red-600"
+              : "border-orange-200 bg-orange-50 text-accent shadow-xs"
           }`}
         >
           <Icon aria-hidden="true" className="size-5" />
@@ -185,7 +185,10 @@ export function TaskList({
   }
 
   return (
-    <section aria-labelledby="task-list-heading">
+    <section
+      aria-labelledby="task-list-heading"
+      className="overflow-hidden rounded-2xl border border-line bg-surface shadow-xs"
+    >
       <h2 id="task-list-heading" className="sr-only">
         Danh sách công việc
       </h2>
@@ -197,47 +200,47 @@ export function TaskList({
         </caption>
 
         <thead className="hidden md:table-header-group">
-          <tr className="border-y border-line bg-raised/60">
+          <tr className="border-b border-line bg-surface-subtle/80">
             <th
               scope="col"
-              className="px-5 py-3 text-left font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-muted"
+              className="px-5 py-3.5 text-left font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted"
             >
               Công việc
             </th>
             <th
               scope="col"
-              className="w-32 px-5 py-3 text-left font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-muted"
+              className="w-32 px-5 py-3.5 text-left font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted"
             >
               Trạng thái
             </th>
             <th
               scope="col"
-              className="w-28 px-5 py-3 text-left font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-muted"
+              className="w-28 px-5 py-3.5 text-left font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted"
             >
               Ưu tiên
             </th>
             <th
               scope="col"
-              className="w-36 px-5 py-3 text-left font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-muted"
+              className="w-36 px-5 py-3.5 text-left font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted"
             >
               Hạn chót
             </th>
             <th
               scope="col"
-              className="w-36 px-5 py-3 text-left font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-muted"
+              className="w-36 px-5 py-3.5 text-left font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted"
             >
               Cập nhật
             </th>
             <th
               scope="col"
-              className="w-64 px-5 py-3 text-right font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-muted"
+              className="w-64 px-5 py-3.5 text-right font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted"
             >
               Thao tác
             </th>
           </tr>
         </thead>
 
-        <tbody className="grid gap-3 md:table-row-group">
+        <tbody className="grid gap-3 p-3 md:table-row-group md:p-0 md:divide-y md:divide-line">
           {items.map((task) => (
             <TaskItemRow
               key={task.id}

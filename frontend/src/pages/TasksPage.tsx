@@ -353,14 +353,14 @@ export function TasksPage() {
       {actionError ? (
         <div
           role="alert"
-          className="mt-6 flex items-center justify-between gap-4 border-l-2 border-danger bg-danger/10 px-4 py-3 text-sm text-danger-ink"
+          className="mt-6 flex items-center justify-between gap-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
         >
           <span>{actionError}</span>
           <button
             type="button"
             onClick={() => setActionError(null)}
             aria-label="Đóng thông báo"
-            className="inline-flex size-6 shrink-0 items-center justify-center rounded-[2px] text-danger-ink hover:bg-danger/20"
+            className="inline-flex size-6 shrink-0 items-center justify-center rounded-lg text-red-700 hover:bg-red-100"
           >
             <X className="size-4" aria-hidden="true" />
           </button>

@@ -72,7 +72,7 @@ export function TaskDeleteDialog({
         {error ? (
           <p
             role="alert"
-            className="border-l-2 border-danger bg-danger/10 px-3 py-2 text-sm leading-6 text-danger-ink"
+            className="rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm leading-6 text-red-700"
           >
             {error}
           </p>
@@ -100,4 +100,3 @@ export function TaskDeleteDialog({
     </TaskDialog>
   );
 }
-

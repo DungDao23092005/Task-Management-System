@@ -12,17 +12,17 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const BASE_STYLES =
-  "inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-[2px] border px-4 text-sm font-semibold tracking-[-0.01em] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas disabled:cursor-not-allowed disabled:opacity-55";
+  "inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl border px-4 text-sm font-medium tracking-[-0.01em] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas disabled:cursor-not-allowed disabled:opacity-55";
 
 const VARIANT_STYLES: Record<ButtonVariant, string> = {
   primary:
-    "border-accent bg-accent text-canvas hover:border-accent-hover hover:bg-accent-hover",
+    "border-accent bg-accent text-white shadow-xs hover:border-accent-hover hover:bg-accent-hover active:bg-accent-hover",
   secondary:
-    "border-line-strong bg-raised text-ink hover:border-muted/50 hover:bg-line",
+    "border-line bg-surface text-ink shadow-xs hover:border-line-strong hover:bg-surface-subtle active:bg-slate-100",
   ghost:
-    "border-transparent bg-transparent text-muted hover:border-line hover:bg-surface hover:text-ink",
+    "border-transparent bg-transparent text-muted hover:bg-slate-100 hover:text-ink active:bg-slate-200",
   danger:
-    "border-danger-strong bg-danger-strong text-ink hover:border-danger-hover hover:bg-danger-hover",
+    "border-danger bg-danger text-white shadow-xs hover:border-danger-strong hover:bg-danger-strong active:bg-danger-hover",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(

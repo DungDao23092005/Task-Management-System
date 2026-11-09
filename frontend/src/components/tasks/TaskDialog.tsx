@@ -113,6 +113,7 @@ export function TaskDialog({
       if (event.shiftKey && document.activeElement === first) {
         event.preventDefault();
         last.focus();
+        return;
       } else if (!event.shiftKey && document.activeElement === last) {
         event.preventDefault();
         first.focus();
@@ -136,7 +137,7 @@ export function TaskDialog({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 overflow-y-auto bg-canvas/80 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/25 p-4 backdrop-blur-xs"
       onMouseDown={(event) => {
         if (
           !panelRef.current?.contains(event.target as Node) &&
@@ -155,15 +156,15 @@ export function TaskDialog({
           aria-describedby={descriptionId}
           tabIndex={-1}
           className={cn(
-            "relative w-full border border-line-strong bg-surface shadow-[0_24px_80px_rgba(0,0,0,0.5)] focus:outline-none",
+            "relative w-full overflow-hidden rounded-2xl border border-line bg-surface shadow-xl shadow-slate-900/10 focus:outline-none",
             size === "lg" ? "max-w-2xl" : "max-w-lg",
           )}
           onMouseDown={(event) => event.stopPropagation()}
         >
-          <header className="flex items-start justify-between gap-4 border-b border-line px-5 py-4 sm:px-6">
+          <header className="flex items-start justify-between gap-4 border-b border-line bg-surface-subtle/50 px-5 py-4 sm:px-6">
             <div>
               {eyebrow ? (
-                <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">
                   {eyebrow}
                 </p>
               ) : null}
@@ -183,7 +184,7 @@ export function TaskDialog({
               onClick={onClose}
               disabled={isBusy}
               aria-label="Đóng hộp thoại"
-              className="-mr-1 inline-flex size-9 shrink-0 items-center justify-center rounded-[2px] text-muted transition-colors hover:bg-raised hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-55"
+              className="-mr-1 inline-flex size-9 shrink-0 items-center justify-center rounded-xl text-muted transition-colors hover:bg-slate-100 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-55"
             >
               <X aria-hidden="true" className="size-4" />
             </button>
@@ -192,7 +193,7 @@ export function TaskDialog({
           <div className="px-5 py-5 sm:px-6">{children}</div>
 
           {footer ? (
-            <footer className="flex flex-wrap justify-end gap-3 border-t border-line px-5 py-4 sm:px-6">
+            <footer className="flex flex-wrap justify-end gap-3 border-t border-line bg-surface-subtle/50 px-5 py-4 sm:px-6">
               {footer}
             </footer>
           ) : null}

@@ -22,7 +22,7 @@ export function PasswordInput(props: PasswordInputProps) {
           onClick={() => setIsVisible((current) => !current)}
           aria-label={isVisible ? "Hide password" : "Show password"}
           aria-pressed={isVisible}
-          className="grid size-8 place-items-center text-muted transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+          className="grid size-8 place-items-center rounded-lg text-muted transition-colors hover:bg-slate-100 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
         >
           {isVisible ? (
             <EyeOff aria-hidden="true" className="size-4" />

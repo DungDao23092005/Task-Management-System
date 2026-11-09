@@ -118,7 +118,7 @@ export function TaskDetailsModal({
     >
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <Spinner size="md" label="Đang tải chi tiết công việc" />
+          <Spinner size="md" label="Đang tải chi tiết công việc" className="text-accent" />
           <p className="mt-3 text-sm text-muted">
             Đang tải chi tiết công việc...
           </p>
@@ -129,7 +129,7 @@ export function TaskDetailsModal({
           aria-live="assertive"
           className="grid gap-4 py-4"
         >
-          <div className="border-l-2 border-danger bg-danger/10 p-4 text-sm leading-6 text-danger-ink">
+          <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm leading-6 text-red-700">
             <p className="font-semibold">Không thể tải thông tin công việc</p>
             <p className="mt-1">
               {error.status === 404
@@ -153,9 +153,9 @@ export function TaskDetailsModal({
         </div>
       ) : task ? (
         <div className="grid gap-6">
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">
                 Trạng thái:
               </span>
               <Badge tone={STATUS_PRESENTATION[task.status].tone}>
@@ -164,7 +164,7 @@ export function TaskDetailsModal({
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">
                 Ưu tiên:
               </span>
               <Badge tone={PRIORITY_PRESENTATION[task.priority].tone}>
@@ -174,20 +174,20 @@ export function TaskDetailsModal({
           </div>
 
           <div className="grid gap-2">
-            <h3 className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-muted">
+            <h3 className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">
               Mô tả
             </h3>
             {task.description ? (
               <p
                 id={descriptionId}
-                className="whitespace-pre-wrap break-words rounded-[2px] border border-line bg-canvas p-4 text-sm leading-6 text-ink"
+                className="whitespace-pre-wrap break-words rounded-xl border border-line bg-surface-subtle p-4 text-sm leading-6 text-ink shadow-xs"
               >
                 {task.description}
               </p>
             ) : (
               <p
                 id={descriptionId}
-                className="rounded-[2px] border border-dashed border-line bg-canvas/50 p-4 text-sm italic text-muted"
+                className="rounded-xl border border-dashed border-line bg-surface-subtle/50 p-4 text-sm italic text-muted"
               >
                 Chưa có mô tả
               </p>
@@ -196,28 +196,28 @@ export function TaskDetailsModal({
 
           <dl className="grid gap-3 border-t border-line pt-4 sm:grid-cols-3">
             <div>
-              <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
+              <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">
                 Hạn chót
               </dt>
-              <dd className="mt-1 text-xs leading-5 text-ink">
+              <dd className="mt-1 text-xs font-medium leading-5 text-ink">
                 {formatDateTime(task.due_date, "vi-VN", "Chưa đặt hạn")}
               </dd>
             </div>
 
             <div>
-              <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
+              <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">
                 Ngày tạo
               </dt>
-              <dd className="mt-1 text-xs leading-5 text-ink">
+              <dd className="mt-1 text-xs font-medium leading-5 text-ink">
                 {formatDateTime(task.created_at, "vi-VN")}
               </dd>
             </div>
 
             <div>
-              <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
+              <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">
                 Cập nhật
               </dt>
-              <dd className="mt-1 text-xs leading-5 text-ink">
+              <dd className="mt-1 text-xs font-medium leading-5 text-ink">
                 {formatDateTime(task.updated_at, "vi-VN")}
               </dd>
             </div>

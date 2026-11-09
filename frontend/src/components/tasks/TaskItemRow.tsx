@@ -44,11 +44,11 @@ const STATUS_OPTIONS: ReadonlyArray<{ value: TaskStatus; label: string }> = [
 ];
 
 const CELL_CLASS =
-  "border-b border-line px-4 py-3 last:border-b-0 md:border-0 md:px-5 md:py-4 md:align-top";
+  "border-b border-line/60 px-4 py-3 last:border-b-0 md:border-0 md:px-5 md:py-4 md:align-top";
 
 function CellLabel({ children }: { children: string }) {
   return (
-    <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted md:hidden">
+    <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-muted md:hidden">
       {children}
     </span>
   );
@@ -104,10 +104,10 @@ export function TaskItemRow({
       id={`task-row-${task.id}`}
       data-highlighted={isHighlighted ? "true" : undefined}
       className={cn(
-        "block overflow-hidden border transition-colors duration-300 last:border-b-0 md:table-row md:border-x-0 md:border-t-0 md:border-b md:border-line",
+        "block overflow-hidden transition-colors duration-200 md:table-row",
         isHighlighted
-          ? "border-accent bg-accent/10 ring-1 ring-accent/60 md:bg-accent/10 motion-safe:animate-pulse"
-          : "border-line bg-surface md:bg-transparent md:hover:bg-raised/40",
+          ? "rounded-xl border border-orange-400 bg-orange-50/90 ring-2 ring-orange-400/50 md:rounded-none md:border-0 md:bg-orange-50/70 motion-safe:animate-pulse"
+          : "rounded-xl border border-line bg-surface p-1 shadow-xs md:rounded-none md:border-0 md:bg-transparent md:p-0 md:shadow-none md:hover:bg-slate-50/75",
       )}
     >
       <td className={`${CELL_CLASS} block md:table-cell`}>
@@ -169,7 +169,7 @@ export function TaskItemRow({
               aria-label={`Đổi trạng thái cho "${task.title}"`}
               aria-busy={isUpdatingStatus || undefined}
               onChange={handleStatusSelect}
-              className="h-8 appearance-none rounded-[2px] border border-line-strong bg-canvas pl-2.5 pr-7 font-mono text-[11px] text-ink transition-colors duration-150 hover:border-accent focus-visible:border-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-55"
+              className="h-8 appearance-none rounded-lg border border-line bg-surface pl-2.5 pr-7 font-mono text-[11px] font-medium text-ink shadow-xs transition-colors duration-150 hover:border-line-strong focus-visible:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-55"
             >
               {STATUS_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -194,7 +194,7 @@ export function TaskItemRow({
               variant="ghost"
               onClick={() => onViewDetails(task)}
               aria-label={`Xem chi tiết "${task.title}"`}
-              className="h-8 px-2.5 text-xs"
+              className="h-8 rounded-lg px-2.5 text-xs"
             >
               Chi tiết
             </Button>
@@ -205,7 +205,7 @@ export function TaskItemRow({
               variant="ghost"
               onClick={() => onEdit(task)}
               aria-label={`Chỉnh sửa "${task.title}"`}
-              className="h-8 px-2.5 text-xs"
+              className="h-8 rounded-lg px-2.5 text-xs"
             >
               Chỉnh sửa
             </Button>
@@ -216,7 +216,7 @@ export function TaskItemRow({
               variant="ghost"
               onClick={() => onDelete(task)}
               aria-label={`Xóa "${task.title}"`}
-              className="h-8 px-2.5 text-xs text-danger-ink hover:border-danger/30 hover:bg-danger/10"
+              className="h-8 rounded-lg px-2.5 text-xs text-red-600 hover:border-red-200 hover:bg-red-50 hover:text-red-700"
             >
               Xóa
             </Button>

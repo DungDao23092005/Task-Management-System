@@ -35,11 +35,11 @@ function SidebarProfile() {
   }
 
   return (
-    <div className="border-t border-line px-4 py-4">
-      <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted">
+    <div className="border-t border-line bg-surface-subtle px-5 py-4">
+      <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-muted">
         Signed in
       </p>
-      <p className="mt-2 truncate text-sm font-medium text-ink">
+      <p className="mt-1.5 truncate text-sm font-semibold text-ink">
         {user.full_name}
       </p>
       <p className="mt-0.5 truncate text-xs text-muted">{user.email}</p>
@@ -58,16 +58,16 @@ function SidebarContent({
         <Link
           to="/dashboard"
           onClick={onNavigate}
-          className="flex min-w-0 items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+          className="flex min-w-0 items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
         >
-          <span className="grid size-9 shrink-0 place-items-center border border-line-strong bg-raised">
+          <span className="grid size-9 shrink-0 place-items-center rounded-xl border border-orange-200 bg-orange-50 shadow-xs">
             <Command aria-hidden="true" className="size-4 text-accent" />
           </span>
           <span className="min-w-0 leading-none">
             <span className="block truncate text-sm font-semibold tracking-[-0.02em] text-ink">
               Fieldnote
             </span>
-            <span className="mt-1 block font-mono text-[9px] uppercase tracking-[0.2em] text-muted">
+            <span className="mt-1 block font-mono text-[9px] uppercase tracking-[0.18em] text-muted">
               Task workspace
             </span>
           </span>
@@ -78,7 +78,7 @@ function SidebarContent({
             ref={closeButtonRef}
             type="button"
             onClick={onClose}
-            className="grid size-9 shrink-0 place-items-center border border-line-strong bg-raised text-muted transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+            className="grid size-9 shrink-0 place-items-center rounded-xl border border-line bg-surface text-muted transition-colors hover:bg-slate-100 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
             aria-label="Close navigation"
           >
             <X aria-hidden="true" className="size-4" />
@@ -87,10 +87,10 @@ function SidebarContent({
       </div>
 
       <nav aria-label="Workspace" className="flex-1 px-3 py-6">
-        <p className="px-3 font-mono text-[9px] uppercase tracking-[0.18em] text-muted">
+        <p className="px-3 font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-muted">
           Workspace
         </p>
-        <ul className="mt-3 grid gap-1">
+        <ul className="mt-3 grid gap-1.5">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
 
@@ -101,10 +101,10 @@ function SidebarContent({
                   onClick={onNavigate}
                   className={({ isActive }) =>
                     cn(
-                      "group flex h-10 items-center gap-3 rounded-[2px] border px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface",
+                      "group flex h-10 items-center gap-3 rounded-xl border px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface",
                       isActive
-                        ? "border-line-strong bg-raised text-ink"
-                        : "border-transparent text-muted hover:border-line hover:bg-surface hover:text-ink",
+                        ? "border-orange-200 bg-orange-50/90 font-semibold text-orange-950 shadow-xs"
+                        : "border-transparent text-slate-600 hover:border-line hover:bg-slate-100/70 hover:text-ink",
                     )
                   }
                 >
@@ -113,7 +113,7 @@ function SidebarContent({
                       <Icon
                         aria-hidden="true"
                         className={cn(
-                          "size-4",
+                          "size-4 shrink-0",
                           isActive ? "text-accent" : "text-muted",
                         )}
                       />
@@ -235,7 +235,7 @@ export function Sidebar({ isMobileOpen, onClose }: SidebarProps) {
             type="button"
             tabIndex={-1}
             aria-label="Dismiss navigation"
-            className="absolute inset-0 size-full bg-canvas/80 backdrop-blur-sm"
+            className="absolute inset-0 size-full bg-slate-900/25 backdrop-blur-xs"
             onClick={onClose}
           />
           <div
@@ -244,7 +244,7 @@ export function Sidebar({ isMobileOpen, onClose }: SidebarProps) {
             role="dialog"
             aria-modal="true"
             aria-label="Workspace navigation"
-            className="relative flex h-full w-[min(18rem,85vw)] flex-col border-r border-line bg-surface shadow-2xl"
+            className="relative flex h-full w-[min(18rem,85vw)] flex-col border-r border-line bg-surface shadow-xl"
           >
             <SidebarContent
               onNavigate={onClose}

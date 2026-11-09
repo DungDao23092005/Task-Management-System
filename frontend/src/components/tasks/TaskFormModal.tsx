@@ -113,10 +113,10 @@ function FormSelect({
   const errorId = `${id}-error`;
 
   return (
-    <div className="grid gap-2">
+    <div className="grid gap-1.5">
       <label
         htmlFor={id}
-        className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-muted"
+        className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted"
       >
         {label}
       </label>
@@ -128,16 +128,16 @@ function FormSelect({
         aria-describedby={error ? errorId : undefined}
         onChange={(event) => onChange(event.target.value)}
         className={cn(
-          "h-10 w-full rounded-[2px] border bg-canvas px-3 text-sm text-ink transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-55",
+          "h-10 w-full rounded-xl border bg-surface px-3 text-sm text-ink shadow-xs transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-55",
           error
             ? "border-danger focus-visible:border-danger focus-visible:ring-danger"
-            : "border-line-strong focus-visible:border-accent focus-visible:ring-accent",
+            : "border-line hover:border-line-strong focus-visible:border-accent focus-visible:ring-accent",
         )}
       >
         {children}
       </select>
       {error ? (
-        <p id={errorId} className="text-xs leading-5 text-danger-ink">
+        <p id={errorId} className="text-xs font-medium leading-5 text-danger-strong">
           {error}
         </p>
       ) : null}
@@ -275,10 +275,10 @@ export function TaskFormModal({
           onChange={(event) => updateValue("title", event.target.value)}
         />
 
-        <div className="grid gap-2">
+        <div className="grid gap-1.5">
           <label
             htmlFor={descriptionId}
-            className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-muted"
+            className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-muted"
           >
             Mô tả
           </label>
@@ -293,16 +293,16 @@ export function TaskFormModal({
             }
             onChange={(event) => updateValue("description", event.target.value)}
             className={cn(
-              "w-full resize-y rounded-[2px] border bg-canvas px-3 py-2.5 text-sm leading-6 text-ink transition-colors duration-150 placeholder:text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-55",
+              "w-full resize-y rounded-xl border bg-surface px-3 py-2.5 text-sm leading-6 text-ink shadow-xs transition-colors duration-150 placeholder:text-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-55",
               fieldErrors.description
                 ? "border-danger focus-visible:border-danger focus-visible:ring-danger"
-                : "border-line-strong focus-visible:border-accent focus-visible:ring-accent",
+                : "border-line hover:border-line-strong focus-visible:border-accent focus-visible:ring-accent",
             )}
           />
           {fieldErrors.description ? (
             <p
               id={descriptionErrorId}
-              className="text-xs leading-5 text-danger-ink"
+              className="text-xs font-medium leading-5 text-danger-strong"
             >
               {fieldErrors.description}
             </p>
@@ -357,7 +357,7 @@ export function TaskFormModal({
           <p
             id={formErrorId}
             role="alert"
-            className="border-l-2 border-danger bg-danger/10 px-3 py-2 text-sm leading-6 text-danger-ink"
+            className="rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm leading-6 text-red-700"
           >
             {formError}
           </p>
