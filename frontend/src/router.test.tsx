@@ -33,6 +33,16 @@ vi.mock("./services/auth-api", () => ({
   registerUser: vi.fn(),
 }));
 
+vi.mock("./services/dashboard-api", () => ({
+  getDashboardStats: vi.fn().mockResolvedValue({
+    total_tasks: 0,
+    completed_tasks: 0,
+    in_progress_tasks: 0,
+    todo_tasks: 0,
+    upcoming_deadlines: [],
+  }),
+}));
+
 const mockedFetchCurrentUser = vi.mocked(fetchCurrentUser);
 const mockedLoginUser = vi.mocked(loginUser);
 const mockedLogoutUser = vi.mocked(logoutUser);
@@ -208,7 +218,7 @@ describe("application routes", () => {
     const router = renderApp("/login");
 
     expect(
-      await screen.findByRole("heading", { name: "Dashboard" }),
+      await screen.findByRole("heading", { name: "Bảng điều khiển" }),
     ).toBeInTheDocument();
     expect(router.state.location.pathname).toBe("/dashboard");
   });

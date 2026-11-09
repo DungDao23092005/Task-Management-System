@@ -1,110 +1,95 @@
 import { ArrowUpRight } from "lucide-react";
+import { Link } from "react-router";
 
-import { Badge } from "../components/ui/Badge";
-import { useAuth } from "../context/AuthContext";
+import { DashboardEmptyState } from "../components/dashboard/DashboardEmptyState";
+import { DashboardSkeleton } from "../components/dashboard/DashboardSkeleton";
+import { MetricsStrip } from "../components/dashboard/MetricsStrip";
+import { UpcomingDeadlinesList } from "../components/dashboard/UpcomingDeadlinesList";
+import { Button } from "../components/ui/Button";
+import { useDashboardStats } from "../hooks/useDashboardStats";
 
 export function DashboardPage() {
-  const { user } = useAuth();
-  const firstName = user?.full_name.trim().split(/\s+/)[0] ?? "there";
+  const { data, isLoading, error, refetch } = useDashboardStats();
 
   return (
-    <div className="mx-auto w-full max-w-5xl">
-      <header className="border-b border-line pb-8">
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
-          Workspace / Overview
-        </p>
-        <div className="mt-3 flex flex-wrap items-center gap-3">
-          <h1 className="text-3xl font-semibold tracking-[-0.04em] text-ink sm:text-4xl">
-            Dashboard
-          </h1>
-          <Badge tone="done">Authenticated</Badge>
-        </div>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
-          A quick read on what needs attention. Live task metrics and upcoming
-          deadlines arrive with the task workspace.
-        </p>
-      </header>
-
-      <section className="mt-8 grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.65fr)]">
-        <article className="border border-line bg-surface p-6 sm:p-8">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <Badge tone="in-progress">Workspace ready</Badge>
-            <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-muted">
-              01 / Overview
-            </span>
+    <div className="mx-auto w-full max-w-6xl">
+      <header className="border-b border-line pb-7">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
+              Fieldnote / Tổng quan
+            </p>
+            <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-ink sm:text-4xl">
+              Bảng điều khiển
+            </h1>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
+              Một góc nhìn gọn về tiến độ công việc, nhịp hoàn thành và những
+              hạn chót cần được chú ý tiếp theo.
+            </p>
           </div>
 
-          <h2 className="mt-10 max-w-[16ch] text-balance text-3xl font-semibold tracking-[-0.04em] text-ink">
-            Good to see you, {firstName}.
-          </h2>
-          <p className="mt-4 max-w-xl text-sm leading-6 text-muted">
-            Your account is connected and this area is protected. Once task
-            data exists, this page will summarize the work that needs your
-            attention without inventing numbers in the meantime.
-          </p>
+          <Link
+            to="/tasks"
+            className="inline-flex min-h-11 w-fit shrink-0 items-center justify-center gap-2 border border-line-strong bg-raised px-4 text-sm font-semibold text-ink transition-colors hover:border-muted/50 hover:bg-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
+          >
+            Mở khu vực công việc
+            <ArrowUpRight aria-hidden="true" className="size-4" />
+          </Link>
+        </div>
+      </header>
 
-          <dl className="mt-10 grid gap-px border border-line bg-line sm:grid-cols-2">
-            <div className="bg-surface p-4">
-              <dt className="font-mono text-[9px] uppercase tracking-[0.16em] text-muted">
-                Session
-              </dt>
-              <dd className="mt-2 text-sm font-medium text-ink">Active</dd>
-            </div>
-            <div className="bg-surface p-4">
-              <dt className="font-mono text-[9px] uppercase tracking-[0.16em] text-muted">
-                Access
-              </dt>
-              <dd className="mt-2 text-sm font-medium text-ink">
-                Authenticated
-              </dd>
-            </div>
-          </dl>
-        </article>
+      <div className="mt-6 grid gap-4">
+        {isLoading && !data ? <DashboardSkeleton /> : null}
 
-        <aside className="border border-line bg-surface p-6">
-          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted">
-            Next wave
-          </p>
-          <ol className="mt-4 grid gap-4">
-            <li className="flex gap-3 border-t border-line pt-4">
-              <span className="font-mono text-[10px] text-accent">01</span>
-              <div>
-                <p className="text-sm font-medium text-ink">Task workspace</p>
-                <p className="mt-1 text-xs leading-5 text-muted">
-                  Create and manage real tasks.
-                </p>
-              </div>
-            </li>
-            <li className="flex gap-3 border-t border-line pt-4">
-              <span className="font-mono text-[10px] text-accent">02</span>
-              <div>
-                <p className="text-sm font-medium text-ink">Live overview</p>
-                <p className="mt-1 text-xs leading-5 text-muted">
-                  Counts and deadlines from your data.
-                </p>
-              </div>
-            </li>
-            <li className="flex gap-3 border-t border-line pt-4">
-              <span className="font-mono text-[10px] text-accent">03</span>
-              <div>
-                <p className="text-sm font-medium text-ink">Focus tools</p>
-                <p className="mt-1 text-xs leading-5 text-muted">
-                  Search, filter, and priority views.
-                </p>
-              </div>
-            </li>
-          </ol>
+        {!isLoading && error && !data ? (
+          <section
+            role="alert"
+            aria-labelledby="dashboard-error-heading"
+            className="relative overflow-hidden border border-danger/45 bg-surface p-6 sm:p-8"
+          >
+            <span
+              aria-hidden="true"
+              className="absolute inset-y-0 left-0 w-px bg-danger"
+            />
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-danger-ink">
+              Kết nối / Gián đoạn
+            </p>
+            <h2
+              id="dashboard-error-heading"
+              className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-ink"
+            >
+              Không thể tải bảng điều khiển.
+            </h2>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-muted">
+              {error.isNetworkError
+                ? "Không thể kết nối tới máy chủ. Kiểm tra kết nối mạng và thử lại."
+                : "Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại."}
+            </p>
+            <Button
+              variant="secondary"
+              onClick={refetch}
+              className="mt-6"
+              aria-label="Thử lại tải bảng điều khiển"
+            >
+              Thử lại
+            </Button>
+          </section>
+        ) : null}
 
-          <p className="mt-8 border-t border-line pt-4 text-xs leading-5 text-muted">
-            Nothing on this screen is mocked. The API is ready, but this view
-            stays intentionally empty until the task workspace lands.
-          </p>
-          <p className="mt-4 inline-flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.16em] text-muted">
-            Fieldnote / Wave 02
-            <ArrowUpRight aria-hidden="true" className="size-3" />
-          </p>
-        </aside>
-      </section>
+        {data ? (
+          <>
+            <MetricsStrip stats={data} />
+
+            {data.total_tasks === 0 ? (
+              <DashboardEmptyState />
+            ) : (
+              <UpcomingDeadlinesList
+                deadlines={data.upcoming_deadlines}
+              />
+            )}
+          </>
+        ) : null}
+      </div>
     </div>
   );
 }
