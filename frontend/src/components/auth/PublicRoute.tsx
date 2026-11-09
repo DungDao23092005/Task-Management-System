@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Navigate, Outlet, useLocation } from "react-router";
 
 import { useAuth } from "../../context/AuthContext";
@@ -23,5 +24,9 @@ export function PublicRoute() {
     return <Navigate to={destination} replace />;
   }
 
-  return <Outlet />;
+  return (
+    <Suspense fallback={<SessionLoadingScreen />}>
+      <Outlet />
+    </Suspense>
+  );
 }

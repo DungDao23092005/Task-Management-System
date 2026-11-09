@@ -354,7 +354,7 @@ describe("TasksPage", () => {
       await user.click(screen.getByRole("button", { name: "Tạo công việc" }));
 
       expect(
-        screen.getByRole("heading", { name: "Tạo công việc" }),
+        await screen.findByRole("heading", { name: "Tạo công việc" }),
       ).toBeInTheDocument();
 
       await user.type(screen.getByLabelText("Tiêu đề"), "Viết test mới");
@@ -396,6 +396,9 @@ describe("TasksPage", () => {
         ).toBeInTheDocument();
       });
 
+      // Does not trigger a redundant getTask because initialTask is supplied from current list
+      expect(tasksApi.getTask).not.toHaveBeenCalled();
+
       // Transition to Edit
       await user.click(
         within(screen.getByRole("dialog")).getByRole("button", {
@@ -428,7 +431,7 @@ describe("TasksPage", () => {
       );
 
       expect(
-        screen.getByRole("heading", { name: "Chỉnh sửa công việc" }),
+        await screen.findByRole("heading", { name: "Chỉnh sửa công việc" }),
       ).toBeInTheDocument();
 
       const titleInput = screen.getByLabelText("Tiêu đề");
@@ -466,7 +469,7 @@ describe("TasksPage", () => {
       );
 
       expect(
-        screen.getByRole("heading", { name: "Xóa công việc này?" }),
+        await screen.findByRole("heading", { name: "Xóa công việc này?" }),
       ).toBeInTheDocument();
       expect(
         screen.getByText(/"Nộp báo cáo thử việc"/),
@@ -572,7 +575,7 @@ describe("TasksPage", () => {
       renderTasksPage();
 
       await user.click(screen.getByRole("button", { name: "Tạo công việc" }));
-      expect(screen.getByRole("dialog")).toBeInTheDocument();
+      expect(await screen.findByRole("dialog")).toBeInTheDocument();
 
       await user.keyboard("{Escape}");
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -749,6 +752,9 @@ describe("TasksPage", () => {
           screen.getByRole("heading", { name: "Báo cáo doanh số tháng 11" }),
         ).toBeInTheDocument();
       });
+
+      // Exactly 1 call was made (the initial banner lookup). No duplicate GET was fired on modal open!
+      expect(tasksApi.getTask).toHaveBeenCalledTimes(1);
     });
 
     it("displays 404 message and cleans up query when task does not exist", async () => {

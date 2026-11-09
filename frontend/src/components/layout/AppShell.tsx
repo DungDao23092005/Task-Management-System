@@ -1,7 +1,8 @@
-import { useCallback, useState } from "react";
+import { Suspense, useCallback, useState } from "react";
 import { Outlet } from "react-router";
 
 import { Header } from "./Header";
+import { RouteLoadingFallback } from "./RouteLoadingFallback";
 import { Sidebar } from "./Sidebar";
 
 export function AppShell() {
@@ -35,7 +36,9 @@ export function AppShell() {
           id="main-content"
           className="mx-auto w-full max-w-6xl flex-1 px-5 py-8 sm:px-8 lg:px-10 lg:py-10"
         >
-          <Outlet />
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>

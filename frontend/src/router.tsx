@@ -1,14 +1,18 @@
+import { Suspense } from "react";
 import { Navigate } from "react-router";
 import type { RouteObject } from "react-router";
 
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { PublicRoute } from "./components/auth/PublicRoute";
 import { AppShell } from "./components/layout/AppShell";
-import { DashboardPage } from "./pages/DashboardPage";
-import { LoginPage } from "./pages/LoginPage";
-import { NotFoundPage } from "./pages/NotFoundPage";
-import { RegisterPage } from "./pages/RegisterPage";
-import { TasksPage } from "./pages/TasksPage";
+import { SessionLoadingScreen } from "./components/layout/SessionLoadingScreen";
+import {
+  DashboardPage,
+  LoginPage,
+  NotFoundPage,
+  RegisterPage,
+  TasksPage,
+} from "./pages/lazyPages";
 
 export const appRoutes: RouteObject[] = [
   {
@@ -36,6 +40,10 @@ export const appRoutes: RouteObject[] = [
   },
   {
     path: "*",
-    element: <NotFoundPage />,
+    element: (
+      <Suspense fallback={<SessionLoadingScreen />}>
+        <NotFoundPage />
+      </Suspense>
+    ),
   },
 ];

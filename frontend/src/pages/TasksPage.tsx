@@ -1,5 +1,5 @@
 import { Plus, X } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import axios from "axios";
 
@@ -14,15 +14,29 @@ import {
 } from "../services/tasks-api";
 import type { Task, TaskStatus, TaskUpdatePayload } from "../types/task";
 import { Button } from "../components/ui/Button";
-import { TaskDeleteDialog } from "../components/tasks/TaskDeleteDialog";
-import { TaskDetailsModal } from "../components/tasks/TaskDetailsModal";
+import { ModalLoadingFallback } from "../components/tasks/ModalLoadingFallback";
 import { TaskFilterBar } from "../components/tasks/TaskFilterBar";
-import { TaskFormModal } from "../components/tasks/TaskFormModal";
 import { TaskHighlightBanner } from "../components/tasks/TaskHighlightBanner";
 import type { HighlightBannerState } from "../components/tasks/TaskHighlightBanner";
 import { TaskList } from "../components/tasks/TaskList";
 import { TaskPagination } from "../components/tasks/TaskPagination";
 import { useTasks } from "../hooks/useTasks";
+
+const TaskDeleteDialog = lazy(() =>
+  import("../components/tasks/TaskDeleteDialog").then((m) => ({
+    default: m.TaskDeleteDialog,
+  })),
+);
+const TaskDetailsModal = lazy(() =>
+  import("../components/tasks/TaskDetailsModal").then((m) => ({
+    default: m.TaskDetailsModal,
+  })),
+);
+const TaskFormModal = lazy(() =>
+  import("../components/tasks/TaskFormModal").then((m) => ({
+    default: m.TaskFormModal,
+  })),
+);
 
 export function TasksPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -52,6 +66,7 @@ export function TasksPage() {
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [viewingTaskId, setViewingTaskId] = useState<number | null>(null);
+  const [viewingTask, setViewingTask] = useState<Task | null>(null);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [deletingTask, setDeletingTask] = useState<Task | null>(null);
 
@@ -305,6 +320,7 @@ export function TasksPage() {
 
   const handleEditFromDetails = useCallback((task: Task) => {
     setViewingTaskId(null);
+    setViewingTask(null);
     setEditingTask(task);
   }, []);
 
@@ -355,7 +371,15 @@ export function TasksPage() {
         <div className="mt-6">
           <TaskHighlightBanner
             state={highlightBannerState}
-            onOpenDetails={(id) => setViewingTaskId(id)}
+            onOpenDetails={(id) => {
+              setViewingTaskId(id);
+              if (
+                highlightBannerState?.type === "found" &&
+                highlightBannerState.task.id === id
+              ) {
+                setViewingTask(highlightBannerState.task);
+              }
+            }}
             onRetry={handleRetryHighlight}
             onDismiss={handleDismissHighlightBanner}
           />
@@ -383,7 +407,10 @@ export function TasksPage() {
           highlightedTaskId={highlightedTaskId}
           onClearFilters={clearFilters}
           onRetry={refetch}
-          onViewDetails={(task) => setViewingTaskId(task.id)}
+          onViewDetails={(task) => {
+            setViewingTaskId(task.id);
+            setViewingTask(task);
+          }}
           onEdit={(task) => setEditingTask(task)}
           onDelete={(task) => setDeletingTask(task)}
           onStatusChange={handleQuickStatusChange}
@@ -404,39 +431,53 @@ export function TasksPage() {
       </div>
 
       {isCreateOpen ? (
-        <TaskFormModal
-          mode="create"
-          isSubmitting={isSubmitting}
-          onClose={() => setIsCreateOpen(false)}
-          onSubmit={handleCreateTask}
-        />
+        <Suspense fallback={<ModalLoadingFallback />}>
+          <TaskFormModal
+            mode="create"
+            isSubmitting={isSubmitting}
+            onClose={() => setIsCreateOpen(false)}
+            onSubmit={handleCreateTask}
+          />
+        </Suspense>
       ) : null}
 
       {editingTask ? (
-        <TaskFormModal
-          mode="edit"
-          task={editingTask}
-          isSubmitting={isSubmitting}
-          onClose={() => setEditingTask(null)}
-          onSubmit={handleEditTask}
-        />
+        <Suspense fallback={<ModalLoadingFallback />}>
+          <TaskFormModal
+            mode="edit"
+            task={editingTask}
+            isSubmitting={isSubmitting}
+            onClose={() => setEditingTask(null)}
+            onSubmit={handleEditTask}
+          />
+        </Suspense>
       ) : null}
 
       {viewingTaskId !== null ? (
-        <TaskDetailsModal
-          taskId={viewingTaskId}
-          onClose={() => setViewingTaskId(null)}
-          onEdit={handleEditFromDetails}
-        />
+        <Suspense fallback={<ModalLoadingFallback />}>
+          <TaskDetailsModal
+            taskId={viewingTaskId}
+            initialTask={
+              viewingTask?.id === viewingTaskId ? viewingTask : undefined
+            }
+            onClose={() => {
+              setViewingTaskId(null);
+              setViewingTask(null);
+            }}
+            onEdit={handleEditFromDetails}
+          />
+        </Suspense>
       ) : null}
 
       {deletingTask ? (
-        <TaskDeleteDialog
-          task={deletingTask}
-          isDeleting={isDeleting}
-          onClose={() => setDeletingTask(null)}
-          onConfirm={handleConfirmDelete}
-        />
+        <Suspense fallback={<ModalLoadingFallback />}>
+          <TaskDeleteDialog
+            task={deletingTask}
+            isDeleting={isDeleting}
+            onClose={() => setDeletingTask(null)}
+            onConfirm={handleConfirmDelete}
+          />
+        </Suspense>
       ) : null}
     </div>
   );

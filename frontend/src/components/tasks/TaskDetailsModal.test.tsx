@@ -250,4 +250,102 @@ describe("TaskDetailsModal", () => {
     await user.click(screen.getByRole("button", { name: "Chỉnh sửa" }));
     expect(handleEdit).toHaveBeenCalledWith(MOCK_TASK);
   });
+
+  describe("duplicate GET remediation with initialTask", () => {
+    it("renders immediately and skips getTask when matching initialTask is provided", () => {
+      render(
+        <TaskDetailsModal
+          taskId={42}
+          initialTask={MOCK_TASK}
+          onClose={vi.fn()}
+          onEdit={vi.fn()}
+        />,
+      );
+
+      expect(tasksApi.getTask).not.toHaveBeenCalled();
+      expect(
+        screen.getByRole("heading", { name: "Hoàn thiện báo cáo quý" }),
+      ).toBeInTheDocument();
+      expect(screen.getByText("Đang làm")).toBeInTheDocument();
+      expect(screen.getByText("Cao")).toBeInTheDocument();
+    });
+
+    it("fetches via getTask when initialTask id does not match taskId", async () => {
+      vi.mocked(tasksApi.getTask).mockResolvedValue({
+        ...MOCK_TASK,
+        id: 99,
+        title: "Công việc khác",
+      });
+
+      render(
+        <TaskDetailsModal
+          taskId={99}
+          initialTask={MOCK_TASK} // id 42 !== 99
+          onClose={vi.fn()}
+          onEdit={vi.fn()}
+        />,
+      );
+
+      expect(tasksApi.getTask).toHaveBeenCalledWith(99, expect.any(AbortSignal));
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole("heading", { name: "Công việc khác" }),
+        ).toBeInTheDocument();
+      });
+    });
+
+    it("fetches fresh data from server on retry even if initialTask was provided", async () => {
+      const user = userEvent.setup();
+      vi.mocked(tasksApi.getTask).mockResolvedValue({
+        ...MOCK_TASK,
+        title: "Báo cáo đã cập nhật trên server",
+      });
+
+      const { rerender } = render(
+        <TaskDetailsModal
+          taskId={42}
+          initialTask={MOCK_TASK}
+          onClose={vi.fn()}
+          onEdit={vi.fn()}
+        />,
+      );
+
+      expect(tasksApi.getTask).not.toHaveBeenCalled();
+      expect(
+        screen.getByRole("heading", { name: "Hoàn thiện báo cáo quý" }),
+      ).toBeInTheDocument();
+
+      // Simulate a network failure during background retry or subsequent error
+      vi.mocked(tasksApi.getTask)
+        .mockRejectedValueOnce(new ApiError("Server error", { status: 500 }))
+        .mockResolvedValueOnce({
+          ...MOCK_TASK,
+          title: "Báo cáo đã cập nhật trên server",
+        });
+
+      // Force an error via changing taskId to something that fails, then retry
+      rerender(
+        <TaskDetailsModal
+          taskId={99}
+          onClose={vi.fn()}
+          onEdit={vi.fn()}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByRole("alert")).toBeInTheDocument();
+      });
+
+      const retryBtn = screen.getByRole("button", { name: "Thử lại" });
+      await user.click(retryBtn);
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole("heading", { name: "Báo cáo đã cập nhật trên server" }),
+        ).toBeInTheDocument();
+      });
+      expect(tasksApi.getTask).toHaveBeenCalledWith(99, expect.any(AbortSignal));
+    });
+  });
 });

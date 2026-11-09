@@ -32,28 +32,35 @@ const PRIORITY_PRESENTATION: Record<
 
 interface TaskDetailsModalProps {
   taskId: number;
+  initialTask?: Task;
   onClose: () => void;
   onEdit: (task: Task) => void;
 }
 
 export function TaskDetailsModal({
   taskId,
+  initialTask,
   onClose,
   onEdit,
 }: TaskDetailsModalProps) {
   const titleId = useId();
   const descriptionId = useId();
-  const [task, setTask] = useState<Task | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const isInitialValid = initialTask != null && initialTask.id === taskId;
+  const [task, setTask] = useState<Task | null>(
+    isInitialValid ? initialTask : null,
+  );
+  const [isLoading, setIsLoading] = useState(!isInitialValid);
   const [error, setError] = useState<ApiError | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
 
   const [prevTaskId, setPrevTaskId] = useState(taskId);
   if (prevTaskId !== taskId) {
     setPrevTaskId(taskId);
-    setIsLoading(true);
+    setReloadKey(0);
+    const valid = initialTask != null && initialTask.id === taskId;
+    setIsLoading(!valid);
     setError(null);
-    setTask(null);
+    setTask(valid ? initialTask : null);
   }
 
   const handleRetry = useCallback(() => {
@@ -63,6 +70,10 @@ export function TaskDetailsModal({
   }, []);
 
   useEffect(() => {
+    if (reloadKey === 0 && initialTask != null && initialTask.id === taskId) {
+      return;
+    }
+
     const controller = new AbortController();
     let cancelled = false;
 
@@ -92,7 +103,7 @@ export function TaskDetailsModal({
       cancelled = true;
       controller.abort();
     };
-  }, [taskId, reloadKey]);
+  }, [taskId, reloadKey, initialTask]);
 
   const dialogTitle = task?.title ?? "Chi tiết công việc";
 
