@@ -43,6 +43,16 @@ vi.mock("./services/dashboard-api", () => ({
   }),
 }));
 
+vi.mock("./services/tasks-api", () => ({
+  listTasks: vi.fn().mockResolvedValue({
+    items: [],
+    total: 0,
+    page: 1,
+    page_size: 10,
+    total_pages: 0,
+  }),
+}));
+
 const mockedFetchCurrentUser = vi.mocked(fetchCurrentUser);
 const mockedLoginUser = vi.mocked(loginUser);
 const mockedLogoutUser = vi.mocked(logoutUser);
@@ -141,7 +151,7 @@ describe("application routes", () => {
     await user.click(screen.getByRole("button", { name: "Sign in" }));
 
     expect(
-      await screen.findByRole("heading", { name: "Tasks" }),
+      await screen.findByRole("heading", { name: "Quản lý công việc" }),
     ).toBeInTheDocument();
     expect(router.state.location.pathname).toBe("/tasks");
   });
@@ -249,7 +259,7 @@ describe("application routes", () => {
     await user.click(screen.getByRole("button", { name: "Try again" }));
 
     expect(
-      await screen.findByRole("heading", { name: "Tasks" }),
+      await screen.findByRole("heading", { name: "Quản lý công việc" }),
     ).toBeInTheDocument();
   });
 

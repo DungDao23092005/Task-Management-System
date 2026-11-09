@@ -1,61 +1,443 @@
-import { ListChecks } from "lucide-react";
+import { Plus, X } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router";
+import axios from "axios";
 
-import { Badge } from "../components/ui/Badge";
+import { normalizeApiError } from "../lib/api-errors";
+import { parseHighlightTaskId } from "../lib/highlight";
+import {
+  createTask,
+  deleteTask,
+  getTask,
+  patchTaskStatus,
+  updateTask,
+} from "../services/tasks-api";
+import type { Task, TaskStatus, TaskUpdatePayload } from "../types/task";
+import { Button } from "../components/ui/Button";
+import { TaskDeleteDialog } from "../components/tasks/TaskDeleteDialog";
+import { TaskDetailsModal } from "../components/tasks/TaskDetailsModal";
+import { TaskFilterBar } from "../components/tasks/TaskFilterBar";
+import { TaskFormModal } from "../components/tasks/TaskFormModal";
+import { TaskHighlightBanner } from "../components/tasks/TaskHighlightBanner";
+import type { HighlightBannerState } from "../components/tasks/TaskHighlightBanner";
+import { TaskList } from "../components/tasks/TaskList";
+import { TaskPagination } from "../components/tasks/TaskPagination";
+import { useTasks } from "../hooks/useTasks";
 
 export function TasksPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const rawHighlightParam = searchParams.get("highlight");
+  const highlightId = parseHighlightTaskId(rawHighlightParam);
+
+  const {
+    items,
+    total,
+    page,
+    pageSize,
+    totalPages,
+    search,
+    debouncedSearch,
+    status,
+    priority,
+    isLoading,
+    error,
+    refetch,
+    setPage,
+    setPageSize,
+    setSearch,
+    setStatus,
+    setPriority,
+    clearFilters,
+  } = useTasks();
+
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [viewingTaskId, setViewingTaskId] = useState<number | null>(null);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [deletingTask, setDeletingTask] = useState<Task | null>(null);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [updatingStatusTaskId, setUpdatingStatusTaskId] = useState<
+    number | null
+  >(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  // Step 4 highlight state
+  const [expiredHighlightId, setExpiredHighlightId] = useState<number | null>(
+    null,
+  );
+  const [highlightBannerState, setHighlightBannerState] =
+    useState<HighlightBannerState | null>(null);
+  const [retryTrigger, setRetryTrigger] = useState(0);
+
+  const timerRef = useRef<number | null>(null);
+
+  const removeHighlightQuery = useCallback(() => {
+    setSearchParams(
+      (previous) => {
+        const next = new URLSearchParams(previous);
+        next.delete("highlight");
+        return next;
+      },
+      { replace: true },
+    );
+  }, [setSearchParams]);
+
+  // Clean up invalid highlight queries (e.g. highlight=abc or highlight=-5)
+  useEffect(() => {
+    if (rawHighlightParam !== null && highlightId === null) {
+      removeHighlightQuery();
+    }
+  }, [rawHighlightParam, highlightId, removeHighlightQuery]);
+
+  // Derived row highlight ID
+  const highlightedTaskId =
+    !isLoading &&
+    !error &&
+    highlightId !== null &&
+    expiredHighlightId !== highlightId &&
+    items.some((item) => item.id === highlightId)
+      ? highlightId
+      : null;
+
+  // Scenario 1: Task exists in current items -> scroll, highlight for 3s, remove query
+  useEffect(() => {
+    if (highlightedTaskId === null) {
+      return;
+    }
+
+    const element = document.getElementById(`task-row-${highlightedTaskId}`);
+    if (element) {
+      const prefersReducedMotion =
+        typeof window !== "undefined" &&
+        window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+
+      element.scrollIntoView({
+        behavior: prefersReducedMotion ? "auto" : "smooth",
+        block: "center",
+      });
+    }
+
+    if (timerRef.current !== null) {
+      window.clearTimeout(timerRef.current);
+    }
+
+    const activeId = highlightedTaskId;
+    timerRef.current = window.setTimeout(() => {
+      setExpiredHighlightId(activeId);
+      removeHighlightQuery();
+      timerRef.current = null;
+    }, 3000);
+
+    return () => {
+      if (timerRef.current !== null) {
+        window.clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [highlightedTaskId, removeHighlightQuery]);
+
+  // Scenario 2: Task NOT in current items -> single GET detail fallback
+  useEffect(() => {
+    if (isLoading || error || highlightId === null) {
+      return;
+    }
+
+    const taskInItems = items.some((item) => item.id === highlightId);
+    if (taskInItems) {
+      return;
+    }
+
+    const controller = new AbortController();
+    let isCancelled = false;
+
+    getTask(highlightId, controller.signal)
+      .then((task) => {
+        if (isCancelled || controller.signal.aborted) {
+          return;
+        }
+
+        setHighlightBannerState({ type: "found", task });
+        removeHighlightQuery();
+      })
+      .catch((requestError: unknown) => {
+        if (
+          isCancelled ||
+          controller.signal.aborted ||
+          axios.isCancel(requestError)
+        ) {
+          return;
+        }
+
+        const apiError = normalizeApiError(requestError);
+
+        if (apiError.status === 404) {
+          setHighlightBannerState({ type: "not_found" });
+          removeHighlightQuery();
+        } else {
+          const message = apiError.isNetworkError
+            ? "Không thể kết nối tới máy chủ. Kiểm tra kết nối mạng và thử lại."
+            : "Không thể tải thông tin công việc được liên kết. Vui lòng thử lại.";
+          setHighlightBannerState({
+            type: "error",
+            message,
+            isRetrying: false,
+          });
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+      controller.abort();
+    };
+  }, [
+    highlightId,
+    isLoading,
+    error,
+    items,
+    retryTrigger,
+    removeHighlightQuery,
+  ]);
+
+  const handleRetryHighlight = useCallback(() => {
+    setHighlightBannerState((previous) =>
+      previous?.type === "error"
+        ? { ...previous, isRetrying: true }
+        : previous,
+    );
+    setRetryTrigger((previous) => previous + 1);
+  }, []);
+
+  const handleDismissHighlightBanner = useCallback(() => {
+    setHighlightBannerState(null);
+    if (rawHighlightParam !== null) {
+      removeHighlightQuery();
+    }
+  }, [rawHighlightParam, removeHighlightQuery]);
+
+  const hasActiveFilters = Boolean(search.trim() || status || priority);
+  const hasActiveServerFilters = Boolean(
+    debouncedSearch || status || priority,
+  );
+
+  const handleCreateTask = async (payload: TaskUpdatePayload) => {
+    setIsSubmitting(true);
+    try {
+      await createTask(payload);
+      setIsCreateOpen(false);
+
+      const hasFiltersOrNonFirstPage = Boolean(
+        search.trim() || status || priority || page > 1,
+      );
+
+      if (hasFiltersOrNonFirstPage) {
+        clearFilters();
+      } else {
+        refetch();
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleEditTask = async (payload: TaskUpdatePayload) => {
+    if (!editingTask) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await updateTask(editingTask.id, payload);
+      setEditingTask(null);
+      refetch();
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingTask) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      await deleteTask(deletingTask.id);
+      const isLastItemOnSubsequentPage = page > 1 && items.length === 1;
+
+      setDeletingTask(null);
+
+      if (isLastItemOnSubsequentPage) {
+        setPage(page - 1);
+      } else {
+        refetch();
+      }
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleQuickStatusChange = useCallback(
+    async (task: Task, nextStatus: TaskStatus) => {
+      if (updatingStatusTaskId === task.id) {
+        return;
+      }
+
+      setUpdatingStatusTaskId(task.id);
+      setActionError(null);
+
+      try {
+        await patchTaskStatus(task.id, { status: nextStatus });
+        refetch();
+      } catch (err) {
+        const apiError = normalizeApiError(err);
+        const message = apiError.isNetworkError
+          ? "Không thể kết nối tới máy chủ. Kiểm tra kết nối mạng và thử lại."
+          : "Không thể cập nhật trạng thái công việc. Vui lòng thử lại.";
+        setActionError(message);
+        throw err;
+      } finally {
+        setUpdatingStatusTaskId(null);
+      }
+    },
+    [refetch, updatingStatusTaskId],
+  );
+
+  const handleEditFromDetails = useCallback((task: Task) => {
+    setViewingTaskId(null);
+    setEditingTask(task);
+  }, []);
+
   return (
-    <div className="mx-auto w-full max-w-5xl">
-      <header className="border-b border-line pb-8">
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
-          Workspace / Tasks
-        </p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-ink sm:text-4xl">
-          Tasks
-        </h1>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
-          The working list for everything you need to move forward. This route
-          is protected and ready for the task features in the next wave.
-        </p>
+    <div className="mx-auto w-full max-w-6xl">
+      <header className="border-b border-line pb-7">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
+              Fieldnote / Công việc
+            </p>
+            <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-ink sm:text-4xl">
+              Quản lý công việc
+            </h1>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
+              Quản lý tiến độ, sắp xếp ưu tiên và theo dõi hạn chót.
+            </p>
+          </div>
+
+          <Button
+            onClick={() => setIsCreateOpen(true)}
+            className="self-start sm:self-auto"
+          >
+            <Plus className="size-4" aria-hidden="true" />
+            Tạo công việc
+          </Button>
+        </div>
       </header>
 
-      <section className="mt-8 border border-line bg-surface p-6 sm:p-10">
-        <div className="mx-auto flex max-w-md flex-col items-center text-center">
-          <span className="grid size-12 place-items-center border border-line-strong bg-raised">
-            <ListChecks aria-hidden="true" className="size-5 text-accent" />
-          </span>
-          <div className="mt-5">
-            <Badge tone="todo">Not wired yet</Badge>
-          </div>
-          <h2 className="mt-5 text-2xl font-semibold tracking-[-0.03em] text-ink">
-            A clear list starts here.
-          </h2>
-          <p className="mt-3 text-sm leading-6 text-muted">
-            Task creation, filtering, search, and status changes arrive in the
-            next wave. No placeholder rows or invented counts are shown on this
-            screen.
-          </p>
-          <div className="mt-8 grid w-full grid-cols-3 gap-px border border-line bg-line">
-            <div className="bg-surface px-3 py-3">
-              <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">
-                Create
-              </p>
-              <p className="mt-1 text-xs text-ink">Next wave</p>
-            </div>
-            <div className="bg-surface px-3 py-3">
-              <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">
-                Filter
-              </p>
-              <p className="mt-1 text-xs text-ink">Next wave</p>
-            </div>
-            <div className="bg-surface px-3 py-3">
-              <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted">
-                Update
-              </p>
-              <p className="mt-1 text-xs text-ink">Next wave</p>
-            </div>
-          </div>
+      {actionError ? (
+        <div
+          role="alert"
+          className="mt-6 flex items-center justify-between gap-4 border-l-2 border-danger bg-danger/10 px-4 py-3 text-sm text-danger-ink"
+        >
+          <span>{actionError}</span>
+          <button
+            type="button"
+            onClick={() => setActionError(null)}
+            aria-label="Đóng thông báo"
+            className="inline-flex size-6 shrink-0 items-center justify-center rounded-[2px] text-danger-ink hover:bg-danger/20"
+          >
+            <X className="size-4" aria-hidden="true" />
+          </button>
         </div>
-      </section>
+      ) : null}
+
+      {highlightBannerState ? (
+        <div className="mt-6">
+          <TaskHighlightBanner
+            state={highlightBannerState}
+            onOpenDetails={(id) => setViewingTaskId(id)}
+            onRetry={handleRetryHighlight}
+            onDismiss={handleDismissHighlightBanner}
+          />
+        </div>
+      ) : null}
+
+      <div className="mt-6 grid gap-4">
+        <TaskFilterBar
+          search={search}
+          status={status}
+          priority={priority}
+          hasActiveFilters={hasActiveFilters}
+          onSearchChange={setSearch}
+          onStatusChange={setStatus}
+          onPriorityChange={setPriority}
+          onClearFilters={clearFilters}
+        />
+
+        <TaskList
+          items={items}
+          isLoading={isLoading}
+          error={error}
+          hasActiveFilters={hasActiveServerFilters}
+          updatingStatusTaskId={updatingStatusTaskId}
+          highlightedTaskId={highlightedTaskId}
+          onClearFilters={clearFilters}
+          onRetry={refetch}
+          onViewDetails={(task) => setViewingTaskId(task.id)}
+          onEdit={(task) => setEditingTask(task)}
+          onDelete={(task) => setDeletingTask(task)}
+          onStatusChange={handleQuickStatusChange}
+          onCreateTask={() => setIsCreateOpen(true)}
+        />
+
+        {!isLoading && !error && total > 0 ? (
+          <TaskPagination
+            page={page}
+            pageSize={pageSize}
+            total={total}
+            totalPages={totalPages}
+            isLoading={isLoading}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+          />
+        ) : null}
+      </div>
+
+      {isCreateOpen ? (
+        <TaskFormModal
+          mode="create"
+          isSubmitting={isSubmitting}
+          onClose={() => setIsCreateOpen(false)}
+          onSubmit={handleCreateTask}
+        />
+      ) : null}
+
+      {editingTask ? (
+        <TaskFormModal
+          mode="edit"
+          task={editingTask}
+          isSubmitting={isSubmitting}
+          onClose={() => setEditingTask(null)}
+          onSubmit={handleEditTask}
+        />
+      ) : null}
+
+      {viewingTaskId !== null ? (
+        <TaskDetailsModal
+          taskId={viewingTaskId}
+          onClose={() => setViewingTaskId(null)}
+          onEdit={handleEditFromDetails}
+        />
+      ) : null}
+
+      {deletingTask ? (
+        <TaskDeleteDialog
+          task={deletingTask}
+          isDeleting={isDeleting}
+          onClose={() => setDeletingTask(null)}
+          onConfirm={handleConfirmDelete}
+        />
+      ) : null}
     </div>
   );
 }

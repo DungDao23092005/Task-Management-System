@@ -1,17 +1,25 @@
 import axios from "axios";
 
 export type AuthFieldName = "email" | "password" | "full_name";
-export type AuthFieldErrors = Partial<Record<AuthFieldName, string>>;
+export type TaskFieldName =
+  | "title"
+  | "description"
+  | "status"
+  | "priority"
+  | "due_date";
+export type ApiFieldName = AuthFieldName | TaskFieldName;
+export type ApiFieldErrors = Partial<Record<ApiFieldName, string>>;
+export type AuthFieldErrors = ApiFieldErrors;
 
 interface ApiErrorInit {
   status?: number | null;
-  fieldErrors?: AuthFieldErrors;
+  fieldErrors?: ApiFieldErrors;
   isNetworkError?: boolean;
 }
 
 export class ApiError extends Error {
   readonly status: number | null;
-  readonly fieldErrors: AuthFieldErrors;
+  readonly fieldErrors: ApiFieldErrors;
   readonly isNetworkError: boolean;
 
   constructor(message: string, init: ApiErrorInit = {}) {
@@ -23,22 +31,31 @@ export class ApiError extends Error {
   }
 }
 
-const AUTH_FIELDS = new Set<AuthFieldName>(["email", "password", "full_name"]);
+const API_FIELDS = new Set<ApiFieldName>([
+  "email",
+  "password",
+  "full_name",
+  "title",
+  "description",
+  "status",
+  "priority",
+  "due_date",
+]);
 
-function isAuthFieldName(value: unknown): value is AuthFieldName {
-  return typeof value === "string" && AUTH_FIELDS.has(value as AuthFieldName);
+function isApiFieldName(value: unknown): value is ApiFieldName {
+  return typeof value === "string" && API_FIELDS.has(value as ApiFieldName);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
-function extractValidationErrors(detail: unknown): AuthFieldErrors {
+function extractValidationErrors(detail: unknown): ApiFieldErrors {
   if (!Array.isArray(detail)) {
     return {};
   }
 
-  const fieldErrors: AuthFieldErrors = {};
+  const fieldErrors: ApiFieldErrors = {};
 
   for (const item of detail) {
     if (!isRecord(item)) {
@@ -49,7 +66,7 @@ function extractValidationErrors(detail: unknown): AuthFieldErrors {
     const field = location.at(-1);
     const message = typeof item.msg === "string" ? item.msg : null;
 
-    if (isAuthFieldName(field) && message) {
+    if (isApiFieldName(field) && message) {
       fieldErrors[field] = message;
     }
   }
@@ -77,6 +94,10 @@ export function normalizeApiError(error: unknown): ApiError {
 
   if (status === 401) {
     return new ApiError("Incorrect email or password.", { status });
+  }
+
+  if (status === 404) {
+    return new ApiError("The requested task was not found.", { status });
   }
 
   if (status === 409) {
