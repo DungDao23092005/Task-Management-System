@@ -190,3 +190,22 @@ def test_health_endpoint(client: TestClient) -> None:
 
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
+
+
+def test_logout_returns_200_when_authenticated(client: TestClient) -> None:
+    register_response = _register(client)
+    token = create_access_token(register_response.json()["id"])
+
+    response = client.post(
+        "/api/v1/auth/logout",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {"message": "Successfully logged out"}
+
+
+def test_logout_requires_authentication(client: TestClient) -> None:
+    response = client.post("/api/v1/auth/logout")
+
+    assert response.status_code == 401

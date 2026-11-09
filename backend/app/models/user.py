@@ -1,11 +1,15 @@
 """User ORM model."""
 
 from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, DateTime, Integer, Unicode, UniqueConstraint, true
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+
+if TYPE_CHECKING:
+    from app.models.task import Task
 
 
 def utcnow() -> datetime:
@@ -45,4 +49,11 @@ class User(Base):
         nullable=False,
         default=utcnow,
         onupdate=utcnow,
+    )
+
+    tasks: Mapped[list["Task"]] = relationship(
+        "Task",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )

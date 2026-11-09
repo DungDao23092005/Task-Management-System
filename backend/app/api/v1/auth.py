@@ -6,7 +6,13 @@ from sqlalchemy.orm import Session
 from app.api.deps import CurrentUser, DbSession
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
-from app.schemas.user import TokenResponse, UserLogin, UserPublic, UserRegister
+from app.schemas.user import (
+    LogoutResponse,
+    TokenResponse,
+    UserLogin,
+    UserPublic,
+    UserRegister,
+)
 from app.services.auth_service import (
     AuthService,
     EmailAlreadyExistsError,
@@ -69,3 +75,18 @@ def login(payload: UserLogin, db: DbSession) -> TokenResponse:
 )
 def read_current_user(current_user: CurrentUser) -> User:
     return current_user
+
+
+@router.post(
+    "/logout",
+    response_model=LogoutResponse,
+    summary="Log out the current client session",
+)
+def logout(_current_user: CurrentUser) -> LogoutResponse:
+    """Confirm logout.
+
+    JWTs are stateless: this endpoint does not and cannot revoke the token.
+    The client is responsible for discarding its stored access token. The
+    token remains technically valid until its expiration time.
+    """
+    return LogoutResponse(message="Successfully logged out")

@@ -26,7 +26,7 @@ os.environ.setdefault("CORS_ORIGINS", "http://localhost:5173")
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -46,6 +46,16 @@ def engine() -> Generator[Engine, None, None]:
         connect_args={"check_same_thread": False},
         poolclass=StaticPool,
     )
+
+    @event.listens_for(test_engine, "connect")
+    def _enable_sqlite_foreign_keys(
+        _dbapi_connection: object,
+        _connection_record: object,
+    ) -> None:
+        cursor = _dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
+
     Base.metadata.create_all(bind=test_engine)
     try:
         yield test_engine
