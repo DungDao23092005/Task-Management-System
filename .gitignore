@@ -29,3 +29,6 @@ Thumbs.db
 # Other generated artifacts
 logs/
 *.log
+
+# Local-only agent tooling
+.agents/
