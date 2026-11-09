@@ -1,8 +1,11 @@
 """Task business logic."""
 
-from app.models.task import Task, TaskStatus
+import math
+
+from app.models.task import Task, TaskPriority, TaskStatus
 from app.repositories.task_repository import TaskRepository
-from app.schemas.task import TaskCreate, TaskUpdate
+from app.schemas.common import PaginatedResponse
+from app.schemas.task import TaskCreate, TaskResponse, TaskUpdate
 
 
 class TaskNotFoundError(Exception):
@@ -24,8 +27,37 @@ class TaskService:
             raise TaskNotFoundError
         return task
 
-    def list_tasks(self, user_id: int) -> list[Task]:
-        return self.task_repository.list_by_user(user_id)
+    def list_tasks(
+        self,
+        user_id: int,
+        search: str | None,
+        status: TaskStatus | None,
+        priority: TaskPriority | None,
+        page: int,
+        page_size: int,
+    ) -> PaginatedResponse[TaskResponse]:
+        normalized_search = search.strip() if search else None
+        if normalized_search == "":
+            normalized_search = None
+
+        items, total = self.task_repository.list_tasks(
+            user_id=user_id,
+            search=normalized_search,
+            status=status,
+            priority=priority,
+            page=page,
+            page_size=page_size,
+        )
+
+        total_pages = math.ceil(total / page_size) if total > 0 else 0
+
+        return PaginatedResponse[TaskResponse](
+            items=[TaskResponse.model_validate(item) for item in items],
+            total=total,
+            page=page,
+            page_size=page_size,
+            total_pages=total_pages,
+        )
 
     def update_task(
         self,

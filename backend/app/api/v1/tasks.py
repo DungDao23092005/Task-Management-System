@@ -1,11 +1,14 @@
 """Task CRUD HTTP endpoints, scoped to the authenticated user."""
 
-from fastapi import APIRouter, HTTPException, Response, status
+from typing import Annotated
+
+from fastapi import APIRouter, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import CurrentUser, DbSession
-from app.models.task import Task
+from app.models.task import Task, TaskPriority, TaskStatus
 from app.repositories.task_repository import TaskRepository
+from app.schemas.common import PaginatedResponse
 from app.schemas.task import (
     TaskCreate,
     TaskResponse,
@@ -47,12 +50,27 @@ def create_task(
 
 @router.get(
     "",
-    response_model=list[TaskResponse],
-    summary="List the current user's tasks",
+    response_model=PaginatedResponse[TaskResponse],
+    summary="Search, filter, and paginate the current user's tasks",
 )
-def list_tasks(current_user: CurrentUser, db: DbSession) -> list[Task]:
+def list_tasks(
+    current_user: CurrentUser,
+    db: DbSession,
+    search: Annotated[str | None, Query()] = None,
+    status: Annotated[TaskStatus | None, Query()] = None,
+    priority: Annotated[TaskPriority | None, Query()] = None,
+    page: Annotated[int, Query(ge=1)] = 1,
+    page_size: Annotated[int, Query(ge=1, le=100)] = 10,
+) -> PaginatedResponse[TaskResponse]:
     service = _build_service(db)
-    return service.list_tasks(current_user.id)
+    return service.list_tasks(
+        user_id=current_user.id,
+        search=search,
+        status=status,
+        priority=priority,
+        page=page,
+        page_size=page_size,
+    )
 
 
 @router.get(

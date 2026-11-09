@@ -47,14 +47,21 @@ def engine() -> Generator[Engine, None, None]:
         poolclass=StaticPool,
     )
 
+    def _casefold_lower(value: str | None) -> str | None:
+        return value.casefold() if value is not None else None
+
     @event.listens_for(test_engine, "connect")
-    def _enable_sqlite_foreign_keys(
+    def _configure_sqlite_connection(
         _dbapi_connection: object,
         _connection_record: object,
     ) -> None:
         cursor = _dbapi_connection.cursor()
         cursor.execute("PRAGMA foreign_keys=ON")
         cursor.close()
+        # SQLite's built-in lower() is ASCII-only. Override it with Python
+        # casefold so Unicode case-insensitive search can be tested. This is
+        # test-only and does not affect SQL Server behavior.
+        _dbapi_connection.create_function("lower", 1, _casefold_lower)
 
     Base.metadata.create_all(bind=test_engine)
     try:
