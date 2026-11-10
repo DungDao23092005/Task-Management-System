@@ -16,8 +16,9 @@ def create_app() -> FastAPI:
         title="Task Management System API",
         version="0.1.0",
         description=(
-            "Personal task management API with JWT authentication. "
-            "Phase 2 provides user registration, login, and profile access."
+            "Personal task management API with JWT authentication, user-scoped "
+            "task CRUD, search and filtering, dashboard statistics, and Kanban "
+            "status updates."
         ),
         docs_url="/docs",
         redoc_url="/redoc",

@@ -40,6 +40,7 @@ Hệ thống được thiết kế theo mô hình tách biệt Client - Server:
 ### DevOps & Infrastructure
 - **Containerization**: Docker, Docker Compose (v2)
 - **Web Server / Reverse Proxy**: Nginx 1.27 Alpine
+- **CI/CD**: GitHub Actions (Tự động hóa kiểm thử backend và frontend, linting, typecheck và production build)
 
 ---
 
@@ -96,6 +97,21 @@ flowchart LR
 - [x] Tính toán tỷ lệ hoàn thành (completion rate).
 - [x] Danh sách công việc sắp đến hạn (sắp xếp tăng dần theo hạn chót).
 
+### Bảng Kanban (Kanban Board)
+- [x] **Trực quan hóa quy trình 3 cột**: Phân nhóm trạng thái rõ ràng gồm Cần làm (`TODO`), Đang thực hiện (`IN_PROGRESS`), và Hoàn thành (`DONE`).
+- [x] **Kéo và thả trực quan (Native HTML5 Drag & Drop)**: Hỗ trợ kéo thả card giữa các cột trực quan, tương thích trình duyệt mà không cần thư viện ngoài.
+- [x] **Hỗ trợ tiếp cận (Quick Move / Accessibility)**: Menu chuyển trạng thái nhanh ngay trên từng task card dành cho người dùng điều hướng bằng bàn phím hoặc trên thiết bị di động.
+- [x] **Cập nhật lạc quan & Khôi phục (Optimistic Updates & Rollback)**: Cập nhật giao diện tức thời khi di chuyển trạng thái; tự động rollback vị trí cũ và hiển thị thông báo lỗi chi tiết nếu API trả về thất bại.
+- [x] **Bảo vệ cập nhật đồng thời (Concurrent Task Updates Guard)**: Khóa thao tác trùng lặp trên cùng một công việc đang trong quá trình đồng bộ (`updatingTaskIds`).
+- [x] **Giới hạn hiển thị 300 công việc**: Tải tối đa 300 công việc kèm banner cảnh báo rõ ràng khi vượt ngưỡng (khuyến nghị kết hợp tìm kiếm và bộ lọc độ ưu tiên).
+
+### Tự động hóa CI/CD (GitHub Actions CI)
+- [x] **Backend CI**: Kiểm thử tự động trên môi trường Python 3.11, kiểm tra format/linting với Ruff và toàn bộ 125 test cases với Pytest.
+- [x] **Frontend CI**: Kiểm thử tự động trên môi trường Node 22, chạy Vitest (202 tests), TypeScript typecheck (`tsc --noEmit`), ESLint và Vite production build.
+- [x] **Triggers linh hoạt**: Kích hoạt khi có `push` vào nhánh `main`, `master`, `feat/**`, `fix/**`; khi tạo `pull_request` vào `main`, `master`, `feat/**`; hoặc kích hoạt thủ công qua `workflow_dispatch`.
+- [x] **Kiểm soát đồng thời (Concurrency Control)**: Tự động hủy job cũ đang chạy dở dang khi ref nhận commit mới (`cancel-in-progress: true`).
+- [x] **Phân quyền tối thiểu (Least Privilege Permissions)**: Thiết lập cấu hình bảo mật `permissions: contents: read` ở phạm vi toàn workflow.
+
 ### Hiệu năng & Tối ưu hóa (Performance)
 - [x] **Route-level Code Splitting**: Áp dụng `React.lazy` và `Suspense` cho các trang, giữ nguyên App Header và Sidebar không bị unmount khi chuyển trang.
 - [x] **Modal-level Code Splitting**: Các hộp thoại CRUD chỉ tải mã nguồn khi người dùng mở thao tác.
@@ -104,7 +120,29 @@ flowchart LR
 
 ---
 
-## 5. Yêu cầu cài đặt (Prerequisites)
+## 5. Trạng thái tính năng (Completed / Not Implemented)
+
+Bảng tổng hợp chi tiết mức độ hoàn thiện các hạng mục chức năng và phi chức năng trong dự án:
+
+### Đã hoàn thành (Completed)
+- [x] **Xác thực & Cô lập người dùng (Authentication & User Isolation)**: Đăng ký, đăng nhập JWT, băm mật khẩu Argon2id, chống timing attack, Các truy vấn dữ liệu được giới hạn theo người dùng hiện tại, với các kiểm thử xác nhận người dùng không thể truy cập dữ liệu của tài khoản khác.
+- [x] **Quản lý công việc (Task CRUD)**: Tạo mới, xem chi tiết, cập nhật toàn diện và xóa an toàn.
+- [x] **Tìm kiếm, Lọc & Phân trang (Search, Filters & Pagination)**: Debounce search, lọc trạng thái, lọc mức độ ưu tiên, phân trang linh hoạt.
+- [x] **Bảng điều khiển (Dashboard & Upcoming Deadlines)**: Đếm tổng hợp chỉ số, tỷ lệ hoàn thành, danh sách 5 hạn chót sắp đến.
+- [x] **Di chuyển CSDL & Nạp dữ liệu mẫu (Alembic Migrations & Database Seeder)**: Migration lược đồ tự động và seed dữ liệu mẫu phong phú.
+- [x] **Tài liệu API (Swagger/OpenAPI & ReDoc)**: Tài liệu trực quan tương tác chuẩn OpenAPI tại `/docs` và `/redoc`.
+- [x] **Đóng gói container (Docker Compose)**: Khởi chạy toàn bộ hệ thống gồm SQL Server 2022, FastAPI backend và Nginx frontend bằng 1 lệnh duy nhất.
+- [x] **Bảng Kanban (Kanban Board)**: 3 cột trạng thái, Native HTML5 Drag and Drop, Quick Move tiếp cận, optimistic updates và cảnh báo 300 tasks.
+- [x] **Kiểm thử tự động (Automated Tests)**: 125 test cases backend (Pytest) và 202 test cases frontend (Vitest qua 20 test files) đều passed.
+- [x] **Tích hợp liên tục (GitHub Actions CI)**: Workflow tự động kiểm tra linting, typecheck, testing và build độc lập cho cả backend và frontend.
+
+### Chưa triển khai / Không cung cấp trong mã nguồn (Not Implemented / Not Provided)
+- [ ] **Triển khai Cloud-hosted (Cloud Deployment)**: Hệ thống hiện tập trung vào môi trường Docker Compose cục bộ hoàn chỉnh; chưa thiết lập hạ tầng đám mây công cộng (AWS/GCP/Azure).
+- *(Lưu ý: Video demo và upstream Pull Request là các hạng mục bàn giao nộp bài [submission deliverables], không phải là tính năng của ứng dụng).*
+
+---
+
+## 6. Yêu cầu cài đặt (Prerequisites)
 
 Để khởi chạy dự án, máy tính cần đáp ứng:
 - **Docker & Docker Compose v2**: Khuyến nghị Docker Desktop mới nhất.
@@ -115,7 +153,7 @@ flowchart LR
 
 ---
 
-## 6. Biến môi trường (Environment Variables)
+## 7. Biến môi trường (Environment Variables)
 
 Sao chép file mẫu `.env.example` thành `.env`:
 ```bash
@@ -142,7 +180,7 @@ cp .env.example .env
 
 ---
 
-## 7. Hướng dẫn khởi chạy với Docker Compose (Khuyến nghị)
+## 8. Hướng dẫn khởi chạy với Docker Compose (Khuyến nghị)
 
 Chỉ với một câu lệnh duy nhất, toàn bộ hệ thống gồm Database, Backend và Frontend sẽ được xây dựng và khởi chạy tự động:
 
@@ -186,7 +224,7 @@ docker compose down
 
 ---
 
-## 8. Hướng dẫn phát triển cục bộ (Local Development)
+## 9. Hướng dẫn phát triển cục bộ (Local Development)
 
 Nếu muốn chạy trực tiếp trên máy host không qua Docker:
 
@@ -235,7 +273,7 @@ Nếu muốn chạy trực tiếp trên máy host không qua Docker:
 
 ---
 
-## 9. Kiểm thử và Kiểm định chất lượng (QA & Tests)
+## 10. Kiểm thử và Kiểm định chất lượng (QA & Tests)
 
 ### Backend Tests & Lint
 ```bash
@@ -254,16 +292,34 @@ npm --prefix frontend run typecheck
 # Kiểm tra ESLint
 npm --prefix frontend run lint
 
-# Chạy toàn bộ 185 test cases bằng Vitest
+# Chạy toàn bộ 202 test cases (20 test files) bằng Vitest
 npm --prefix frontend test -- --run
 
 # Kiểm tra bản build production
 npm --prefix frontend run build
 ```
 
+> [!NOTE]
+> Dự án đạt 125/125 test cases backend (Pytest) và 202/202 test cases frontend (Vitest) vượt qua kiểm thử thành công. Toàn bộ kịch bản kiểm thử đã định nghĩa đều đạt yêu cầu, tuy nhiên việc passing toàn bộ tests không đồng nghĩa với 100% code coverage.
+
 ---
 
-## 10. Xử lý sự cố thường gặp (Troubleshooting)
+## 11. Hạn chế đã biết (Known Limitations)
+
+Dưới đây là các quyết định thiết kế và giới hạn kiến trúc hiện tại của hệ thống:
+
+1. **Thu hồi phiên đăng xuất với Stateless JWT (Stateless JWT Logout)**:
+   Hệ thống sử dụng mô hình JWT không lưu trạng thái (stateless). Thao tác đăng xuất hiện tại dựa trên việc client xóa access token khỏi LocalStorage. Hệ thống chưa tích hợp Redis token blacklist hoặc cơ chế thu hồi token tức thời ở phía server; một token đã cấp vẫn có hiệu lực về mặt mã hóa cho đến khi hết hạn (`ACCESS_TOKEN_EXPIRE_MINUTES`) trừ khi bị từ chối bởi các tầng xác thực khác.
+2. **Giới hạn số lượng công việc trên Kanban (Kanban 300 Tasks Cap)**:
+   Để tối ưu hóa hiệu năng render DOM và trải nghiệm kéo thả trên trình duyệt, bảng Kanban được cấu hình tải tối đa 300 công việc (thông qua phân trang tối đa 3 trang song song). Khi tài khoản có trên 300 công việc, bảng sẽ hiển thị banner cảnh báo và khuyến nghị người dùng kết hợp bộ lọc từ khóa tìm kiếm hoặc lọc mức độ ưu tiên để thu hẹp tập dữ liệu hiển thị.
+3. **Môi trường cơ sở dữ liệu kiểm thử so với Docker Runtime (SQLite vs. SQL Server)**:
+   Bộ kiểm thử tự động backend (`pytest`) sử dụng SQLite in-memory nhằm đảm bảo tốc độ thực thi, không phụ thuộc service bên ngoài và tính độc lập giữa các test cases. Trong khi đó, Docker runtime sử dụng Microsoft SQL Server 2022 (ODBC Driver 18). Hai hệ quản trị này có những khác biệt về dialect và hành vi truy vấn. Các kiểm tra Docker healthcheck, Alembic migration và seeder giúp xác minh kết nối, khởi tạo schema và nạp dữ liệu trên SQL Server, nhưng không thay thế hoàn toàn việc chạy toàn bộ automated test suite trực tiếp trên SQL Server.
+4. **Phạm vi triển khai đám mây (Cloud Deployment Scope)**:
+   Mã nguồn hiện tại tập trung cung cấp giải pháp đóng gói hoàn chỉnh chạy trên Docker và Docker Compose cục bộ. Việc cấu hình hạ tầng đám mây công cộng (như AWS, GCP hay Azure) chưa nằm trong phạm vi của kho mã nguồn này.
+
+---
+
+## 12. Xử lý sự cố thường gặp (Troubleshooting)
 
 ### 1. Lỗi kết nối SQL Server (`Can't open lib 'ODBC Driver 18 for SQL Server'`)
 - **Nguyên nhân**: Hệ điều hành chưa cài đặt Microsoft ODBC Driver 18.
@@ -283,5 +339,5 @@ npm --prefix frontend run build
 
 ---
 
-## 11. Giấy phép (License)
+## 13. Giấy phép (License)
 Dự án được phát triển phục vụ mục đích đánh giá tuyển dụng và đào tạo kỹ thuật nội bộ.
