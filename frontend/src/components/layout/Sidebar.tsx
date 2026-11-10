@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import type { RefObject } from "react";
 import {
   Command,
+  Kanban,
   LayoutDashboard,
   ListChecks,
   X,
@@ -18,6 +19,7 @@ interface SidebarProps {
 
 const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/kanban", label: "Kanban", icon: Kanban },
   { to: "/tasks", label: "Tasks", icon: ListChecks },
 ] as const;
 

@@ -156,6 +156,38 @@ describe("application routes", () => {
     expect(router.state.location.pathname).toBe("/tasks");
   });
 
+  it("redirects an unauthenticated kanban route and returns after login", async () => {
+    const user = userEvent.setup();
+    const router = renderApp("/kanban");
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Return to your workspace",
+      }),
+    ).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe("/login");
+    expect(router.state.location.state).toMatchObject({ from: "/kanban" });
+
+    await user.type(screen.getByLabelText("Email"), "an@example.com");
+    await user.type(screen.getByLabelText("Password"), "correct-horse");
+    await user.click(screen.getByRole("button", { name: "Sign in" }));
+
+    expect(
+      await screen.findByRole("heading", { name: "Bảng Kanban" }),
+    ).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe("/kanban");
+  });
+
+  it("renders the kanban page for authenticated users at /kanban", async () => {
+    storeAccessToken("stored-token");
+    const router = renderApp("/kanban");
+
+    expect(
+      await screen.findByRole("heading", { name: "Bảng Kanban" }),
+    ).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe("/kanban");
+  });
+
   it("toggles login password visibility without submitting or losing the value", async () => {
     const user = userEvent.setup();
     renderApp("/login");

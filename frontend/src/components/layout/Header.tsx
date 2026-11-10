@@ -11,6 +11,7 @@ interface HeaderProps {
 const PAGE_LABELS: Record<string, string> = {
   "/dashboard": "Dashboard",
   "/tasks": "Tasks",
+  "/kanban": "Kanban",
 };
 
 export function Header({

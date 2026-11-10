@@ -8,6 +8,7 @@ import { AppShell } from "./components/layout/AppShell";
 import { SessionLoadingScreen } from "./components/layout/SessionLoadingScreen";
 import {
   DashboardPage,
+  KanbanPage,
   LoginPage,
   NotFoundPage,
   RegisterPage,
@@ -34,6 +35,7 @@ export const appRoutes: RouteObject[] = [
         children: [
           { path: "dashboard", element: <DashboardPage /> },
           { path: "tasks", element: <TasksPage /> },
+          { path: "kanban", element: <KanbanPage /> },
         ],
       },
     ],
